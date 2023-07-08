@@ -56,6 +56,7 @@ func main() {
 	*/
 
 	resJson := <-channel
+	close(channel)
 	data, prserr := jsonParser1(resJson)
 	if prserr != nil {
 		fmt.Println(err.Error())
