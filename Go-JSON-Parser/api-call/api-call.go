@@ -1,7 +1,6 @@
 package apicall
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,7 +8,7 @@ import (
 )
 
 // pass wg by reference
-func ApiService(url string, wg *sync.WaitGroup) (string, error) {
+func ApiService(url string, wg *sync.WaitGroup, channel chan string) (string, error) {
 	var ret string
 	var eret error
 	wg.Add(1) //add thread to wait group
@@ -24,7 +23,8 @@ func ApiService(url string, wg *sync.WaitGroup) (string, error) {
 			eret = err1
 		} else {
 			ret = string(body)
-			fmt.Printf("response fetched\nbody: %v", ret)
+			channel <- ret //push response into the channel
+			// fmt.Printf("response fetched\nbody: %v", ret)
 		}
 	}
 	wg.Done() //remove from wait group
