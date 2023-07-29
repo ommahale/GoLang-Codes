@@ -59,6 +59,7 @@ func (s *Server) readLoop(conn net.Conn) {
 			continue
 		}
 		s.mssgch <- MessageReciever{payload: buf[:n], from: conn.RemoteAddr().String()}
+		conn.Write([]byte("Message recieved"))
 	}
 }
 func main() {

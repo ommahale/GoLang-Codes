@@ -26,41 +26,38 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("server started")
-	s := Server{}
+	s := Server{
+		sub:    make(chan net.Conn, 20),
+		quitch: make(chan string),
+	}
 	// defer s.pub.Close()
-	s.acceptPub(ln)
+	go s.acceptConn(ln)
 	s.topic = os.Args[1]
-	// go func() {
-	// 	for {
-	// 		ln, err := net.Listen("tcp", "localhost:3001")
-	// 		if err != nil {
-	// 			handleErr(err)
-	// 			break
-	// 		}
-	// 		go s.acceptSub(ln)
-
-	// 	}
-	// }()
 	<-s.quitch
 }
 
-// func (s *Server) acceptSub(ln net.Listener) {
-// 	conn, err := ln.Accept()
-// 	if err != nil {
-// 		handleErr(err)
-// 		return
-// 	}
-// 	s.sub <- conn
-// }
-
-func (s *Server) acceptPub(ln net.Listener) {
-	conn, err := ln.Accept()
-	if err != nil {
-		handleErr(err)
-		return
+func (s *Server) acceptConn(ln net.Listener) {
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			handleErr(err)
+			return
+		}
+		fmt.Println("Client connected: ", conn.RemoteAddr().String())
+		go s.readClient(conn)
 	}
-	s.pub = conn
-	fmt.Println("Publisher connected: ", conn.RemoteAddr().String())
+
+}
+func (s *Server) readClient(conn net.Conn) {
+	buff := make([]byte, 2048)
+	for {
+		n, err := conn.Read(buff)
+		if err != nil {
+			handleErr(err)
+			return
+		}
+		fmt.Println(string(buff[:n]))
+	}
 }
 func handleErr(err error) {
 	fmt.Println("Error occured: ", err.Error())

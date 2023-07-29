@@ -21,16 +21,47 @@ type Director struct {
 	LastName  string `json:"lastname"`
 }
 
+type Error struct {
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+}
+
+type Success struct {
+	Status  int   `json:"status"`
+	Message Movie `json:"message"`
+}
+type SuccessMovies struct {
+	Status  int     `json:"status"`
+	Message []Movie `json:"message"`
+}
+
 const port string = ":8000"
 
 var movies []Movie
 
 func getMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(movies)
+	mssg := SuccessMovies{Status: 200, Message: movies}
+	json.NewEncoder(w).Encode(mssg)
 }
 
-func getMovie(w http.ResponseWriter, r *http.Request)    {}
+func getMovie(w http.ResponseWriter, r *http.Request) {
+	param := mux.Vars(r)
+	id := param["id"]
+	var err Error
+	w.Header().Set("Content-Type", "application/json")
+	for _, ele := range movies {
+		if ele.ID == id {
+			mssg := Success{Status: 200, Message: ele}
+			json.NewEncoder(w).Encode(mssg)
+			return
+		}
+	}
+	err.Status = 404
+	err.Message = "Movie not found"
+	json.NewEncoder(w).Encode(err)
+
+}
 func createMovie(w http.ResponseWriter, r *http.Request) {}
 func updateMovie(w http.ResponseWriter, r *http.Request) {}
 func deleteMovie(w http.ResponseWriter, r *http.Request) {}
