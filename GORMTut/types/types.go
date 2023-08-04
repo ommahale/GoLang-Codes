@@ -16,14 +16,12 @@ type User struct {
 }
 
 func GetNewUser(username string, password string) *User {
-	h := sha256.New()
-	h.Write([]byte(password))
-	hash := base64.URLEncoding.EncodeToString(h.Sum(nil))
+	HashPassword(&password)
 	id := uuid.New()
 	return &User{
 		Uuid:     id.String(),
 		Username: username,
-		Password: hash,
+		Password: password,
 	}
 }
 func HashPassword(password *string) {
