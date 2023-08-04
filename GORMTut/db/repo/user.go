@@ -14,9 +14,11 @@ func (u *UserRepo) CreateUser(user db_types.User, db gorm.DB) {
 	db.Create(&user)
 }
 func (u *UserRepo) FindUser(user db_types.User, db gorm.DB) {
-	result := db.Find(&user)
-	if result.Error == gorm.ErrRecordNotFound {
-		log.Fatal("User not found")
+	var dest db_types.User
+	result := db.Find(&dest, &user)
+	if result.RowsAffected == 0 {
+		log.Println("User not found")
+		return
 	}
-	log.Println("User found, uuid: ", user.Uuid)
+	log.Println("User found, uuid: ", dest.Uuid)
 }

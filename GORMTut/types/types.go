@@ -26,3 +26,8 @@ func GetNewUser(username string, password string) *User {
 		Password: hash,
 	}
 }
+func HashPassword(password *string) {
+	h := sha256.New()
+	h.Write([]byte(*password))
+	*password = base64.URLEncoding.EncodeToString(h.Sum(nil))
+}
