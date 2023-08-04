@@ -1,6 +1,6 @@
 # GORM doc code
 
-## Auth system created using GORM
+Auth system created using GORM
 
 ## Start docker container:
 
